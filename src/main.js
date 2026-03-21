@@ -847,16 +847,31 @@ function handleChoice(choice) {
   else handleWrong(choice)
 }
 
-function onPointerDown(event) {
+function handleTap(clientX, clientY) {
   ensureInteractionReady()
   const rect = renderer.domElement.getBoundingClientRect()
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+  pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1
+  pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1
   raycaster.setFromCamera(pointer, camera)
   const intersections = raycaster.intersectObjects(interactables, true)
   if (!intersections.length) return
   const root = resolveTapTarget(intersections[0].object)
   root?.userData?.onTap?.()
+}
+
+function onPointerDown(event) {
+  handleTap(event.clientX, event.clientY)
+}
+
+function onTouchStart(event) {
+  const touch = event.changedTouches?.[0]
+  if (!touch) return
+  event.preventDefault()
+  handleTap(touch.clientX, touch.clientY)
+}
+
+function onClick(event) {
+  handleTap(event.clientX, event.clientY)
 }
 
 function onResize() {
@@ -948,6 +963,8 @@ function setupScene() {
   drawMissionBoard()
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown)
+  renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false })
+  renderer.domElement.addEventListener('click', onClick)
   window.addEventListener('resize', onResize)
 }
 
