@@ -962,7 +962,6 @@ function setupScene() {
 
   createLights()
   createTerrain()
-  createSkyDecor()
   createMissionBoard()
   createDinoGuide()
   createControls()
