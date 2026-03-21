@@ -15,7 +15,7 @@ app.innerHTML = `
     <div class="world-hud">
       <div class="logo-badge">
         🦖 숫자 공룡 마을
-        <small>월드 안의 버튼을 눌러 놀아요</small>
+        <small>아래 버튼 누르고 숫자를 골라요</small>
       </div>
       <div class="score-row">
         <div class="score-chip"><span>모드</span><strong id="mode-label">알 모드</strong></div>
@@ -24,14 +24,14 @@ app.innerHTML = `
       </div>
     </div>
     <div class="mobile-controls">
-      <button id="ui-mode-egg" class="ui-btn egg">알 모드</button>
-      <button id="ui-start" class="ui-btn start">출발!</button>
-      <button id="ui-mode-block" class="ui-btn block">블록 모드</button>
-      <button id="ui-replay" class="ui-btn replay">다시 듣기</button>
+      <button id="ui-mode-egg" class="ui-btn egg">알 고르기</button>
+      <button id="ui-start" class="ui-btn start">문제 시작</button>
+      <button id="ui-mode-block" class="ui-btn block">블록 고르기</button>
+      <button id="ui-replay" class="ui-btn replay">문제 다시 듣기</button>
     </div>
     <div class="hint-panel">
       <strong id="hint-title">월드 시작!</strong>
-      <p id="hint-text">아래 버튼이나 3D 오브젝트를 눌러 시작해 보세요.</p>
+      <p id="hint-text">아래 버튼으로 모드를 고르고, 문제를 시작한 뒤 맞는 숫자를 눌러요.</p>
     </div>
   </div>
 `
@@ -119,7 +119,7 @@ function updateHUD() {
 
   elements.uiModeEgg.classList.toggle('active', state.mode === 'egg')
   elements.uiModeBlock.classList.toggle('active', state.mode === 'block')
-  elements.uiStart.textContent = state.stage === 'won' ? '다음 미션!' : '출발!'
+  elements.uiStart.textContent = state.stage === 'won' ? '다음 문제' : '문제 시작'
 }
 
 function speak(_text) {
@@ -437,11 +437,11 @@ function drawMissionBoard() {
   texture.needsUpdate = true
 
   if (state.stage === 'playing') {
-    setHint('지금 미션', `${missionPrompt()} 정답이라고 생각하는 오브젝트를 눌러 주세요.`)
+    setHint('지금 할 일', `${missionPrompt()} 맞는 숫자를 눌러 주세요.`)
   } else if (state.stage === 'won') {
-    setHint('성공!', '초록 출발 블록을 눌러 다음 미션으로 넘어가요.')
+    setHint('잘했어요!', '아래 문제 시작 버튼을 눌러 다음 문제로 가요.')
   } else {
-    setHint('준비 완료', `${modeMeta[state.mode].prep}. 초록 출발 블록을 눌러 시작해요.`)
+    setHint('준비 완료', `${modeMeta[state.mode].prep}. 아래 문제 시작 버튼을 눌러요.`)
   }
 }
 
@@ -590,7 +590,7 @@ function createPedestal(config) {
 function createControls() {
   const eggPedestal = createPedestal({
     id: 'mode-egg',
-    position: new THREE.Vector3(-12.5, 2.2, -2.5),
+    position: new THREE.Vector3(-32, 2.2, -18),
     color: 0xffdd74,
     speed: 2.4,
     buildTop(material) {
@@ -603,7 +603,7 @@ function createControls() {
 
   const blockPedestal = createPedestal({
     id: 'mode-block',
-    position: new THREE.Vector3(12.5, 2.2, -2.5),
+    position: new THREE.Vector3(32, 2.2, -18),
     color: 0x78d3ff,
     speed: 2.1,
     buildTop(material) {
@@ -620,7 +620,7 @@ function createControls() {
 
   const startPedestal = createPedestal({
     id: 'start',
-    position: new THREE.Vector3(-8.2, 2.2, 7.3),
+    position: new THREE.Vector3(-32, 2.2, 18),
     color: 0x8cff71,
     speed: 2.7,
     buildTop(material) {
@@ -633,7 +633,7 @@ function createControls() {
 
   const replayPedestal = createPedestal({
     id: 'replay',
-    position: new THREE.Vector3(8.2, 2.2, 7.3),
+    position: new THREE.Vector3(32, 2.2, 18),
     color: 0xff79c8,
     speed: 2.3,
     buildTop(material) {
@@ -650,16 +650,16 @@ function updateControlLabels() {
   const isBlock = state.mode === 'block'
 
   drawButtonSurface(buttonSurfaces.get('mode-egg'), {
-    title: '알 모드', subtitle: isEgg ? '선택됨' : '바꾸기', primary: '#ffe479', secondary: '#ffbc4b', text: '#5d3b00', active: isEgg,
+    title: '알', subtitle: isEgg ? '선택됨' : '고르기', primary: '#ffe479', secondary: '#ffbc4b', text: '#5d3b00', active: isEgg,
   })
   drawButtonSurface(buttonSurfaces.get('mode-block'), {
-    title: '블록 모드', subtitle: isBlock ? '선택됨' : '바꾸기', primary: '#8ce8ff', secondary: '#38afff', text: '#0a4164', active: isBlock,
+    title: '블록', subtitle: isBlock ? '선택됨' : '고르기', primary: '#8ce8ff', secondary: '#38afff', text: '#0a4164', active: isBlock,
   })
   drawButtonSurface(buttonSurfaces.get('start'), {
-    title: state.stage === 'won' ? '다음 미션' : '출발', subtitle: '월드 시작', primary: '#a6ff88', secondary: '#42cb56', text: '#12401d', active: true,
+    title: state.stage === 'won' ? '다음 문제' : '시작', subtitle: '문제 보기', primary: '#a6ff88', secondary: '#42cb56', text: '#12401d', active: true,
   })
   drawButtonSurface(buttonSurfaces.get('replay'), {
-    title: '다시 듣기', subtitle: '한 번 더', primary: '#ffb5e1', secondary: '#ff6ebd', text: '#6b174e', active: state.stage === 'playing',
+    title: '다시 듣기', subtitle: '문제 음성', primary: '#ffb5e1', secondary: '#ff6ebd', text: '#6b174e', active: state.stage === 'playing',
   })
 }
 
