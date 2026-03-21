@@ -11,8 +11,10 @@ const state = {
   target: 3,
   progress: 0,
   audioReady: false,
+  userInteracted: false,
   locked: false,
   currentAudio: null,
+  pendingAudio: null,
 }
 
 const app = document.querySelector('#app')
@@ -131,13 +133,24 @@ function stopAudioPlayback() {
 }
 
 function playAudio(src, fallbackText) {
+  if (!src) {
+    if (fallbackText) speak(fallbackText)
+    return
+  }
+
+  if (!state.userInteracted) {
+    state.pendingAudio = { src, fallbackText }
+    return
+  }
+
   stopAudioPlayback()
   const audio = new Audio(src)
   audio.preload = 'auto'
+  audio.playsInline = true
   state.currentAudio = audio
   audio.play().catch(() => {
     state.currentAudio = null
-    if (fallbackText) speak(fallbackText)
+    state.pendingAudio = { src, fallbackText }
   })
   audio.addEventListener('ended', () => {
     if (state.currentAudio === audio) state.currentAudio = null
@@ -171,11 +184,22 @@ function playMissionSpeech() {
   playAudio(src, missionSpeech())
 }
 
+function flushPendingAudio() {
+  if (!state.pendingAudio) return
+  const { src, fallbackText } = state.pendingAudio
+  state.pendingAudio = null
+  playAudio(src, fallbackText)
+}
+
 function warmupAudio() {
-  if (state.audioReady) return
-  state.audioReady = true
-  preloadAudio()
-  playWarmup()
+  state.userInteracted = true
+  if (!state.audioReady) {
+    state.audioReady = true
+    preloadAudio()
+    playWarmup()
+    return
+  }
+  flushPendingAudio()
 }
 
 function pickTarget() {
@@ -483,4 +507,3 @@ document.querySelector('#switch-mode').addEventListener('click', () => startGame
 setupScene()
 updateHUD()
 startGame('egg')
-setTimeout(() => playAudio(audioClips.introEgg, '안녕! 알 깨기부터 시작해 보자!'), 500)
