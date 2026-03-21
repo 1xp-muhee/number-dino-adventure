@@ -323,11 +323,10 @@ function createTerrain() {
 
   for (let x = -8; x <= 8; x += 1) {
     for (let z = -8; z <= 8; z += 1) {
-      const y = Math.max(0, Math.round((Math.sin(x * 0.45) + Math.cos(z * 0.55)) * 0.3 + 1))
-      for (let depth = 0; depth <= y; depth += 1) {
+      for (let depth = 0; depth <= 1; depth += 1) {
         const cube = new THREE.Mesh(
           new THREE.BoxGeometry(2, 2, 2),
-          depth === y ? (y % 2 === 0 ? grassMaterial : brightGrassMaterial) : (depth % 2 === 0 ? dirtMaterial : dirtDarkMaterial),
+          depth === 1 ? ((x + z) % 2 === 0 ? grassMaterial : brightGrassMaterial) : ((x + z) % 2 === 0 ? dirtMaterial : dirtDarkMaterial),
         )
         cube.position.set(x * 2, depth * 2, z * 2)
         terrainGroup.add(cube)
