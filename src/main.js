@@ -12,6 +12,7 @@ const state = {
   progress: 0,
   audioReady: false,
   locked: false,
+  currentAudio: null,
 }
 
 const app = document.querySelector('#app')
@@ -80,6 +81,31 @@ const elements = {
   stage: document.querySelector('#three-stage'),
 }
 
+const audioClips = {
+  warmup: '/audio/warmup.mp3',
+  introEgg: '/audio/intro-egg.mp3',
+  success: '/audio/success.mp3',
+  retry: '/audio/retry.mp3',
+  mission: {
+    egg: {
+      1: '/audio/mission-egg-1.mp3',
+      2: '/audio/mission-egg-2.mp3',
+      3: '/audio/mission-egg-3.mp3',
+      4: '/audio/mission-egg-4.mp3',
+      5: '/audio/mission-egg-5.mp3',
+      6: '/audio/mission-egg-6.mp3',
+    },
+    block: {
+      1: '/audio/mission-block-1.mp3',
+      2: '/audio/mission-block-2.mp3',
+      3: '/audio/mission-block-3.mp3',
+      4: '/audio/mission-block-4.mp3',
+      5: '/audio/mission-block-5.mp3',
+      6: '/audio/mission-block-6.mp3',
+    },
+  },
+}
+
 function speak(text) {
   if (!('speechSynthesis' in window)) return
   window.speechSynthesis.cancel()
@@ -90,10 +116,63 @@ function speak(text) {
   window.speechSynthesis.speak(utterance)
 }
 
+function stopAudioPlayback() {
+  if (state.currentAudio) {
+    state.currentAudio.pause()
+    state.currentAudio.currentTime = 0
+    state.currentAudio = null
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+  }
+}
+
+function playAudio(src, fallbackText) {
+  stopAudioPlayback()
+  const audio = new Audio(src)
+  audio.preload = 'auto'
+  state.currentAudio = audio
+  audio.play().catch(() => {
+    state.currentAudio = null
+    if (fallbackText) speak(fallbackText)
+  })
+  audio.addEventListener('ended', () => {
+    if (state.currentAudio === audio) state.currentAudio = null
+  })
+}
+
+function preloadAudio() {
+  Object.values(audioClips).forEach((value) => {
+    if (typeof value === 'string') {
+      const audio = new Audio(value)
+      audio.preload = 'auto'
+      audio.load()
+      return
+    }
+    Object.values(value).forEach((nested) => {
+      Object.values(nested).forEach((src) => {
+        const audio = new Audio(src)
+        audio.preload = 'auto'
+        audio.load()
+      })
+    })
+  })
+}
+
+function playWarmup() {
+  playAudio(audioClips.warmup, '안녕! 숫자 게임 시작!')
+}
+
+function playMissionSpeech() {
+  const src = audioClips.mission[state.mode]?.[state.target]
+  playAudio(src, missionSpeech())
+}
+
 function warmupAudio() {
   if (state.audioReady) return
   state.audioReady = true
-  speak('안녕! 숫자 게임 시작!')
+  preloadAudio()
+  playWarmup()
 }
 
 function pickTarget() {
@@ -238,7 +317,7 @@ function startGame(mode = state.mode) {
     createBlockSources()
   }
   warmupAudio()
-  speak(missionSpeech())
+  playMissionSpeech()
 }
 
 function createEggField() {
@@ -315,12 +394,12 @@ function finishRound(success) {
     state.reward += 1
     state.streak += 1
     setResult('딩동댕!', 'success')
-    speak('맞았어! 정말 잘했어!')
+    playAudio(audioClips.success, '맞았어! 정말 잘했어!')
     glow = 1.2
   } else {
     state.streak = 0
     setResult('한 번 더!', 'retry')
-    speak('한 번 더 해보자!')
+    playAudio(audioClips.retry, '한 번 더 해보자!')
   }
   updateHUD()
   setTimeout(() => {
@@ -393,7 +472,7 @@ function animate(time = 0) {
 
 document.querySelector('#speak-mission').addEventListener('click', () => {
   warmupAudio()
-  speak(missionSpeech())
+  playMissionSpeech()
 })
 document.querySelector('#new-game').addEventListener('click', () => startGame(state.mode))
 document.querySelector('#switch-mode').addEventListener('click', () => startGame(state.mode === 'egg' ? 'block' : 'egg'))
@@ -401,4 +480,4 @@ document.querySelector('#switch-mode').addEventListener('click', () => startGame
 setupScene()
 updateHUD()
 startGame('egg')
-setTimeout(() => speak('안녕! 알 깨기부터 시작해 보자!'), 500)
+setTimeout(() => playAudio(audioClips.introEgg, '안녕! 알 깨기부터 시작해 보자!'), 500)
