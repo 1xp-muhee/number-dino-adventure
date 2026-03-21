@@ -122,14 +122,7 @@ function updateHUD() {
   elements.uiStart.textContent = state.stage === 'won' ? '다음 미션!' : '출발!'
 }
 
-function speak(text) {
-  if (!('speechSynthesis' in window)) return
-  window.speechSynthesis.cancel()
-  const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'ko-KR'
-  utterance.rate = 0.94
-  utterance.pitch = 1.06
-  window.speechSynthesis.speak(utterance)
+function speak(_text) {
 }
 
 function stopVoicePlayback() {
@@ -169,14 +162,12 @@ function playQueueEntry(entry) {
       }, { once: true })
     }).catch(() => {
       state.currentAudio = null
-      if (entry.fallbackText) speak(entry.fallbackText)
-      const next = state.audioQueue.shift()
-      playQueueEntry(next)
+      state.audioPlaying = false
+      setHint('소리 다시 켜기', '아이폰에서 소리가 막혔어요. 아래 다시 듣기 버튼을 한 번 눌러 주세요.')
     })
     return
   }
 
-  if (entry.fallbackText) speak(entry.fallbackText)
   state.audioPlaying = false
 }
 
