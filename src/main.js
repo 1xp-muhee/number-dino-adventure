@@ -196,7 +196,7 @@ function warmupAudio() {
   if (!state.audioReady) {
     state.audioReady = true
     preloadAudio()
-    playWarmup()
+    flushPendingAudio()
     return
   }
   flushPendingAudio()
@@ -432,7 +432,7 @@ function finishRound(success) {
   setTimeout(() => {
     const nextMode = state.mode === 'egg' ? 'block' : 'egg'
     startGame(nextMode)
-  }, 1400)
+  }, 2600)
 }
 
 function onPointerDown(event) {
