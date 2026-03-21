@@ -23,9 +23,15 @@ app.innerHTML = `
         <div class="score-chip"><span>연속</span><strong id="streak-count">0</strong></div>
       </div>
     </div>
+    <div class="mobile-controls">
+      <button id="ui-mode-egg" class="ui-btn egg">알 모드</button>
+      <button id="ui-start" class="ui-btn start">출발!</button>
+      <button id="ui-mode-block" class="ui-btn block">블록 모드</button>
+      <button id="ui-replay" class="ui-btn replay">다시 듣기</button>
+    </div>
     <div class="hint-panel">
       <strong id="hint-title">월드 시작!</strong>
-      <p id="hint-text">초록 출발 블록을 눌러 미션을 시작하고, 반짝이는 숫자 오브젝트를 골라 보세요.</p>
+      <p id="hint-text">아래 버튼이나 3D 오브젝트를 눌러 시작해 보세요.</p>
     </div>
   </div>
 `
@@ -37,6 +43,10 @@ const elements = {
   modeLabel: document.querySelector('#mode-label'),
   hintTitle: document.querySelector('#hint-title'),
   hintText: document.querySelector('#hint-text'),
+  uiModeEgg: document.querySelector('#ui-mode-egg'),
+  uiModeBlock: document.querySelector('#ui-mode-block'),
+  uiStart: document.querySelector('#ui-start'),
+  uiReplay: document.querySelector('#ui-replay'),
 }
 
 const baseUrl = import.meta.env.BASE_URL
@@ -95,7 +105,7 @@ const bursts = []
 const buttonSurfaces = new Map()
 const choiceLabelSurfaces = []
 const scheduled = []
-const cameraTarget = new THREE.Vector3(0, 5.8, -1)
+const cameraTarget = new THREE.Vector3(0, 5.2, 1.8)
 
 function setHint(title, text) {
   elements.hintTitle.textContent = title
@@ -106,6 +116,10 @@ function updateHUD() {
   elements.rewardCount.textContent = state.reward
   elements.streakCount.textContent = state.streak
   elements.modeLabel.textContent = modeMeta[state.mode].label
+
+  elements.uiModeEgg.classList.toggle('active', state.mode === 'egg')
+  elements.uiModeBlock.classList.toggle('active', state.mode === 'block')
+  elements.uiStart.textContent = state.stage === 'won' ? '다음 미션!' : '출발!'
 }
 
 function speak(text) {
@@ -941,7 +955,7 @@ function setupScene() {
 
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 200)
-  camera.position.set(0, 12.5, 24)
+  camera.position.set(0, 10.5, 19)
 
   raycaster = new THREE.Raycaster()
   pointer = new THREE.Vector2()
@@ -967,6 +981,26 @@ function setupScene() {
   renderer.domElement.addEventListener('click', onClick)
   window.addEventListener('resize', onResize)
 }
+
+elements.uiModeEgg.addEventListener('click', () => {
+  ensureInteractionReady()
+  switchMode('egg')
+})
+
+elements.uiModeBlock.addEventListener('click', () => {
+  ensureInteractionReady()
+  switchMode('block')
+})
+
+elements.uiStart.addEventListener('click', () => {
+  ensureInteractionReady()
+  startRound()
+})
+
+elements.uiReplay.addEventListener('click', () => {
+  ensureInteractionReady()
+  replayMissionPrompt()
+})
 
 updateHUD()
 setupScene()
