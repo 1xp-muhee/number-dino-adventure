@@ -778,15 +778,15 @@ function switchMode(mode) {
   state.mode = mode
   stopVoicePlayback()
   prepareMission()
-  queueVoice([{ fallbackText: `${modeMeta[mode].label}야. 목표 숫자는 ${numberWords[state.target]}. 초록 출발 블록을 눌러 줘.` }], { replace: true })
+  queueVoice([{ src: missionClip() }], { replace: true })
 }
 
 function replayMissionPrompt() {
   if (state.stage !== 'playing') {
-    queueVoice([{ fallbackText: `${modeMeta[state.mode].prep}. 초록 출발 블록을 눌러 줘.` }], { replace: true })
+    queueVoice([{ src: missionClip() }], { replace: true })
     return
   }
-  queueVoice([{ src: missionClip(), fallbackText: missionPrompt() }], { replace: true })
+  queueVoice([{ src: missionClip() }], { replace: true })
 }
 
 function startRound() {
@@ -800,9 +800,9 @@ function startRound() {
   updateHUD()
   const promptEntries = []
   if (state.mode === 'egg' && state.reward === 0 && state.streak === 0) {
-    promptEntries.push({ src: audioClips.introEgg, fallbackText: '공룡 마을에 온 걸 환영해!' })
+    promptEntries.push({ src: audioClips.introEgg })
   }
-  promptEntries.push({ src: missionClip(), fallbackText: missionPrompt() })
+  promptEntries.push({ src: missionClip() })
   queueVoice(promptEntries, { replace: true })
 }
 
@@ -829,7 +829,7 @@ function handleCorrect(choice) {
   state.reward += state.target
   state.streak += 1
   spawnBurst(choice.getWorldPosition(new THREE.Vector3()), state.mode === 'egg' ? 0xffd85d : 0x86d9ff, 26)
-  queueVoice([{ src: audioClips.success, fallbackText: '정답이야! 정말 잘했어!' }], { replace: true })
+  queueVoice([{ src: audioClips.success }], { replace: true })
   drawMissionBoard()
   updateControlLabels()
   updateHUD()
@@ -840,7 +840,7 @@ function handleWrong(choice) {
   state.locked = false
   state.streak = 0
   spawnBurst(choice.getWorldPosition(new THREE.Vector3()), 0xff7f6a, 10)
-  queueVoice([{ src: audioClips.retry, fallbackText: '다시 찾아보자!' }], { replace: true })
+  queueVoice([{ src: audioClips.retry }], { replace: true })
   drawMissionBoard()
   updateHUD()
 }
