@@ -105,7 +105,7 @@ const bursts = []
 const buttonSurfaces = new Map()
 const choiceLabelSurfaces = []
 const scheduled = []
-const cameraTarget = new THREE.Vector3(0, 5.2, 1.8)
+const cameraTarget = new THREE.Vector3(0, 3.8, 0.6)
 
 function setHint(title, text) {
   elements.hintTitle.textContent = title
@@ -704,23 +704,25 @@ function createNest(value, position) {
   const strawMaterial = new THREE.MeshStandardMaterial({ color: 0xe2af52, roughness: 1 })
   const eggMaterial = new THREE.MeshStandardMaterial({ color: 0xfff6df, roughness: 0.9 })
   const eggShine = new THREE.MeshStandardMaterial({ color: 0xfff0ba, roughness: 0.8 })
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 2.05, 0.9, 12), strawMaterial)
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(2.45, 2.85, 1.05, 16), strawMaterial)
   base.position.y = 2.9
   group.add(base)
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.35, 10, 20), strawMaterial)
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.7, 0.42, 12, 24), strawMaterial)
   ring.rotation.x = Math.PI / 2
-  ring.position.y = 3.1
+  ring.position.y = 3.15
   group.add(ring)
-  const eggOffsets = [[0,0],[-0.45,-0.2],[0.4,0.18],[-0.48,0.45],[0.52,-0.35],[0,0.56]]
+  const eggOffsets = [[0,0],[-0.72,-0.28],[0.72,0.28],[-0.78,0.78],[0.86,-0.68],[0,0.96]]
   for (let index = 0; index < value; index += 1) {
     const [x, z] = eggOffsets[index]
-    const egg = new THREE.Mesh(new THREE.SphereGeometry(0.42, 18, 18), index % 2 === 0 ? eggMaterial : eggShine)
-    egg.scale.y = 1.28
-    egg.position.set(x, 3.65 + (index % 2) * 0.03, z)
+    const egg = new THREE.Mesh(new THREE.SphereGeometry(0.6, 20, 20), index % 2 === 0 ? eggMaterial : eggShine)
+    egg.scale.y = 1.38
+    egg.position.set(x, 3.82 + (index % 2) * 0.04, z)
     group.add(egg)
   }
-  group.add(buildChoiceLabel(value, 'egg'))
-  group.add(createHitBox(3.6, 5.6, 3.6, 4.2))
+  const label = buildChoiceLabel(value, 'egg')
+  label.position.y = 6.55
+  group.add(label)
+  group.add(createHitBox(5.2, 6.4, 5.2, 4.6))
   group.userData.value = value
   registerInteractable(group, () => handleChoice(group))
   pulses.push({ mesh: group, scale: 0.04, speed: 1.5 + value * 0.12, phase: value * 0.45 })
@@ -731,19 +733,19 @@ function createBlockTower(value, position) {
   const group = new THREE.Group()
   group.position.copy(position)
   const palette = [0xff8f70,0xffcd55,0x80dd73,0x5cc8ff,0xc39aff,0xff86cc]
-  const base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.8, 2.6), new THREE.MeshStandardMaterial({ color: 0x8a6f52, roughness: 1 }))
+  const base = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.95, 3.2), new THREE.MeshStandardMaterial({ color: 0x8a6f52, roughness: 1 }))
   base.position.y = 2.7
   group.add(base)
   for (let index = 0; index < value; index += 1) {
-    const block = new THREE.Mesh(new THREE.BoxGeometry(1.75, 1.25, 1.75), new THREE.MeshStandardMaterial({ color: palette[index % palette.length], roughness: 0.82 }))
-    block.position.y = 3.55 + index * 1.2
-    block.rotation.y = (index % 2) * 0.18
+    const block = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.4, 2.1), new THREE.MeshStandardMaterial({ color: palette[index % palette.length], roughness: 0.82 }))
+    block.position.y = 3.8 + index * 1.32
+    block.rotation.y = (index % 2) * 0.12
     group.add(block)
   }
   const label = buildChoiceLabel(value, 'block')
-  label.position.y = 6.9
+  label.position.y = 8.1
   group.add(label)
-  group.add(createHitBox(3.6, 8.5, 3.6, 5.2))
+  group.add(createHitBox(5.2, 10.4, 5.2, 6))
   group.userData.value = value
   registerInteractable(group, () => handleChoice(group))
   pulses.push({ mesh: group, scale: 0.04, speed: 1.4 + value * 0.1, phase: value * 0.38 })
@@ -753,8 +755,8 @@ function createBlockTower(value, position) {
 function buildChoiceField() {
   clearChoiceGroup()
   const positions = [
-    new THREE.Vector3(-10.4, 0, -0.5), new THREE.Vector3(-6.2, 0, 0.9), new THREE.Vector3(-2.1, 0, -0.2),
-    new THREE.Vector3(2.1, 0, -0.2), new THREE.Vector3(6.2, 0, 0.9), new THREE.Vector3(10.4, 0, -0.5),
+    new THREE.Vector3(-13.5, 0, -0.4), new THREE.Vector3(-8.1, 0, 1.2), new THREE.Vector3(-2.7, 0, -0.3),
+    new THREE.Vector3(2.7, 0, -0.3), new THREE.Vector3(8.1, 0, 1.2), new THREE.Vector3(13.5, 0, -0.4),
   ]
   positions.forEach((position, index) => {
     const value = index + 1
@@ -946,7 +948,7 @@ function setupScene() {
 
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 200)
-  camera.position.set(0, 10.5, 19)
+  camera.position.set(0, 18, 11.5)
 
   raycaster = new THREE.Raycaster()
   pointer = new THREE.Vector2()
