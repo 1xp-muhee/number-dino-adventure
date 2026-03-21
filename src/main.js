@@ -620,7 +620,7 @@ function createControls() {
 
   const startPedestal = createPedestal({
     id: 'start',
-    position: new THREE.Vector3(-32, 2.2, 18),
+    position: new THREE.Vector3(-48, 2.2, 28),
     color: 0x8cff71,
     speed: 2.7,
     buildTop(material) {
@@ -633,7 +633,7 @@ function createControls() {
 
   const replayPedestal = createPedestal({
     id: 'replay',
-    position: new THREE.Vector3(32, 2.2, 18),
+    position: new THREE.Vector3(48, 2.2, 28),
     color: 0xff79c8,
     speed: 2.3,
     buildTop(material) {
