@@ -81,27 +81,30 @@ const elements = {
   stage: document.querySelector('#three-stage'),
 }
 
+const baseUrl = import.meta.env.BASE_URL
+const audioPath = (file) => `${baseUrl}audio/${file}`
+
 const audioClips = {
-  warmup: '/audio/warmup.mp3',
-  introEgg: '/audio/intro-egg.mp3',
-  success: '/audio/success.mp3',
-  retry: '/audio/retry.mp3',
+  warmup: audioPath('warmup.mp3'),
+  introEgg: audioPath('intro-egg.mp3'),
+  success: audioPath('success.mp3'),
+  retry: audioPath('retry.mp3'),
   mission: {
     egg: {
-      1: '/audio/mission-egg-1.mp3',
-      2: '/audio/mission-egg-2.mp3',
-      3: '/audio/mission-egg-3.mp3',
-      4: '/audio/mission-egg-4.mp3',
-      5: '/audio/mission-egg-5.mp3',
-      6: '/audio/mission-egg-6.mp3',
+      1: audioPath('mission-egg-1.mp3'),
+      2: audioPath('mission-egg-2.mp3'),
+      3: audioPath('mission-egg-3.mp3'),
+      4: audioPath('mission-egg-4.mp3'),
+      5: audioPath('mission-egg-5.mp3'),
+      6: audioPath('mission-egg-6.mp3'),
     },
     block: {
-      1: '/audio/mission-block-1.mp3',
-      2: '/audio/mission-block-2.mp3',
-      3: '/audio/mission-block-3.mp3',
-      4: '/audio/mission-block-4.mp3',
-      5: '/audio/mission-block-5.mp3',
-      6: '/audio/mission-block-6.mp3',
+      1: audioPath('mission-block-1.mp3'),
+      2: audioPath('mission-block-2.mp3'),
+      3: audioPath('mission-block-3.mp3'),
+      4: audioPath('mission-block-4.mp3'),
+      5: audioPath('mission-block-5.mp3'),
+      6: audioPath('mission-block-6.mp3'),
     },
   },
 }
